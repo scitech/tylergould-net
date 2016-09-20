@@ -14,3 +14,5 @@ gem 'middleman', '>= 4.0.0'
 gem 'middleman-livereload', '3.4.6'
 
 gem "middleman-blog"
+
+gem "middleman-dotenv"

@@ -11,7 +11,7 @@
   RESET
 
 **************************************/
-ul, h1, h2, h3, li, p, div {
+body, ul, h1, h2, h3, li, p, div {
   margin: 0;
   padding: 0;
 }
@@ -51,6 +51,10 @@ body {
   font-size: 18px;
 }
 
+pre {
+  white-space: pre-wrap;
+}
+
 
 h1, h2, h3, p {
   margin: 0 0 1em 0;
@@ -68,22 +72,27 @@ p {
 a {
   text-decoration: underline;
   color: blue;
+  transition: color 300ms ease;
 }
+
 a:visited {
   color: blue;
 }
+
 a:hover {
   color: black;
 }
+
 a:active {
   color: grey;
 }
 
 .menu_link {
-  transition: transform 500ms ease;
-  transform: translateX(0);
+  display: inline-block;
+  transition: transform 500ms ease, color 300ms ease;
+  transform: translateX(0px);
   &:hover {
-    transform: translateX(20px);
+    transform: translateX(3px);
   }
 }
 
@@ -100,6 +109,10 @@ a:active {
     width: 25%;
     margin-right: 30px;
   }
+
+  h1 {
+    font-size: 1.5em;
+  }
 }
 
 /**************************************
@@ -111,35 +124,51 @@ a:active {
 .page {
   padding: 60px 30px 30px 30px;
   @include large {
-  display: flex;
-  align-items: flex-start;
+    display: flex;
+    align-items: flex-start;
   }
 }
 
 .main {
-  padding-top: 75px;
   @include large {
     width: 75%;
   }
 }
 
 .layout {
-  max-width: 50em;
-  margin-left: auto;
-  margin-right: auto;
+  @include large {
+    max-width: 50em;
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
 
 .main_nav {
   margin-bottom: 30px;
 }
 
+.blog_item {
+  padding-bottom: 30px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #dfdfdf;
+}
+
 .blog_item__heading {
   margin: 0;
 }
 
-.blog_item__time {
+.time {
   font-size: .875em;
   font-style: italic;
+}
+
+.post__header {
+  margin-bottom: 2em;
+}
+
+.post__title {
+  margin: 0;
+  font-size: 2em;
 }
 
 .show {

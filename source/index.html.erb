@@ -6,7 +6,7 @@ layout: page_layout
 
 <% blog.articles[0...5].each do |article| %>
   <article class="blog_item">
-    <time class="blog_item__time"><%= article.date.strftime('%b %e %Y') %></time>
+    <time class="time"><%= article.date.strftime('%b %e %Y') %></time>
     <h2 class="blog_item__heading">
       <a href="<%= article.url %>"><%= article.title %></a>
     </h2>
