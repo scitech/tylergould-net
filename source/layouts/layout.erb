@@ -4,17 +4,17 @@
     <meta content="IE=edge" http-equiv="X-UA-Compatible">
     <meta charset="utf-8">
     <meta content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" name="viewport">
-
-    <!-- Use title if it's in the page YAML frontmatter -->
-    <title><%= current_page.data.title || "Middleman" %></title>
-
-  <link href='http://fonts.googleapis.com/css?family=Crimson+Text' rel='stylesheet'>
-
+    <title><%= current_page.data.slug ? "tyler gould | #{current_page.data.slug}" : "tyler gould" %></title>
     <%= stylesheet_link_tag :site %>
     <%= javascript_include_tag :all %>
   </head>
 
   <body class="<%= page_classes %>">
-    <%= yield %>
+    <div class="page">
+      <%= partial 'partials/sidebar', :locals => { :active_page => current_page.data.slug } %>
+      <div class="main">
+        <%= yield %>
+      </div>
+    </div>
   </body>
 </html>

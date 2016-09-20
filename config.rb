@@ -38,6 +38,12 @@ configure :build do
   # activate :minify_javascript
 end
 
+activate :directory_indexes
+
 activate :livereload
 
-activate :blog
+activate :blog do |blog|
+  blog.sources = "posts/{year}-{month}-{day}-{title}"
+  blog.permalink = "{year}/{month}/{day}/{title}"
+  blog.layout = "blog_layout"
+end
