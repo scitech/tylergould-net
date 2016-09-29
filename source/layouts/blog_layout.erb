@@ -4,6 +4,8 @@
       <h1 class="post__title"><%= current_page.data.title %></h1>
       <time class="time"><%= Date.parse(current_page.data.date).strftime('%b %e %Y') %></time>
     </header>
-    <%= yield %>
+    <div class="content content--blog">
+      <%= yield %>
+    </div>
   </article>
 <% end %>

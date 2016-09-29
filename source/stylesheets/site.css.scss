@@ -53,6 +53,16 @@ body {
 
 pre {
   white-space: pre-wrap;
+  font-size: 0.875em;
+  background: #efefef;
+  padding: 1.5em;
+}
+
+code {
+  display: inline-block;
+  font-size: 0.875em;
+  background: #efefef;
+  padding: 0 0.3125em;
 }
 
 
@@ -106,7 +116,7 @@ a:active {
 
 .masthead {
   @include large {
-    width: 25%;
+    width: 20%;
     margin-right: 30px;
   }
 
@@ -131,7 +141,7 @@ a:active {
 
 .main {
   @include large {
-    width: 75%;
+    width: 80%;
   }
 }
 
@@ -145,6 +155,10 @@ a:active {
 
 .main_nav {
   margin-bottom: 30px;
+}
+
+.offsite {
+  margin-top: 2em;
 }
 
 .blog_item {
@@ -169,6 +183,21 @@ a:active {
 .post__title {
   margin: 0;
   font-size: 2em;
+}
+
+.content {
+  h2 {
+    margin-top: 1em;
+  }
+  @include large {
+    max-width: 85%;
+  }
+}
+
+.content--blog {
+  @include large {
+    max-width: 80%;
+  }
 }
 
 .show {
