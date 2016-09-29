@@ -19,3 +19,4 @@
 
 # Ignore my secret information
 .env
+.env.*

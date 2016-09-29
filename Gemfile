@@ -15,4 +15,6 @@ gem 'middleman-livereload', '3.4.6'
 
 gem "middleman-blog"
 
+gem "middleman-deploy"
+
 gem "middleman-dotenv"

@@ -1,0 +1,54 @@
+---
+title: Configuring a Middleman deployment with environment variables
+date: 2016/09/28
+published: true
+---
+
+<p>Keeping track of things, in general, is very easy if you have a small number of things. If my life involved only five objects I would have no problem keeping track of them all. Unfortunately, in order to maintain a basic quality of life I have to remember many more.</p>
+<p>Software projects, too, feel like they have a shape in my memory, and add to the pile of things I have to remember. They call it "increased cognitive load" in these jargony times. Deployment configuration is a good, living example of why state management is frustrating&mdash;it feels like a separate mode of thought from building the site itself. Deployment keys, hosts, credentials, etc, are infrequently accessed and so are easy to forget. Luckily, there are tools.</p>
+<p>If I'm building a static site without a lot of interactivity (e.g., this one), I'll usually use Middleman, which has some helpful packages for managing deployments in a smart way. <a href="https://github.com/middleman-contrib/middleman-deploy">middleman-deploy</a> will move the site to a server, and <a href="https://github.com/middleman-contrib/middleman-dotenv">middleman-dotenv</a> will store and load environment variables.</p>
+<h2>Using middleman-deploy via FTP</h2>
+<p>First, I need to add <code>gem 'middleman-deploy'</code> to my project's Gemfile and run a <code>bundle install</code>.
+<p>Next, I need to point the deployment at my web server, so I add the following to my <code>config.rb</code> file:
+<p><pre>
+activate :deploy do |deploy|
+  deploy.deploy_method = :ftp
+  deploy.host          = 'tylergould.net'
+  deploy.port          = 22
+  deploy.path          = '/path/to/my/webroot'
+  deploy.user          = 'myusername'
+  deploy.password      = 'mypassword'
+end
+</pre></p>
+<p>If I were to commit this to the repo and push it publicly, I'd be a real dunce and the whole world would have access to my web server. Luckily, there are environment variables.</p>
+<h2>Environment variables: where do they come from?</h2>
+<p>Environment variables set in Bash exist for that Bash session, and if they're set with <code>export</code> they exist for any child process Bash spawns. If you don't want them to disappear when you close a terminal session, set them in your .bash_profile or .bashrc. They were confusing to me for a long time because they seemed to come from nowhere, passed down only in the oral traditions of transcontinental web development culture. It turns out, they come from the operating system, as specified in a glorious document called POSIX. <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html#tag_08">You can read the spec yourself</a>.</p>
+<h2>Every process gets its own set of environment variables</h2>
+<p>As soon as you launch a program, it will inherit some variables from Bash and add some of its own. In Ruby, you can see the environment variables available to your Ruby process in a global hash called ENV. Fire up irb and see for yourself:</p>
+<p><pre>
+21558:~ tgould$ irb
+irb(main):001:0> ENV
+=> {"VIRTUALENVWRAPPER_SCRIPT"=>"/usr/local/bin/virtualenvwrapper.sh", "VIRTUALENVWRAPPER_PROJECT_FILENAME"=>".project", "TERM_PROGRAM"=>"Apple_Terminal", "GEM_HOME"=>"/Users/tgould/.gem/ruby/2.3.0", "TERM"=>"xterm-256color", "SHELL"=>"/bin/bash", "TERM_PROGRAM_VERSION"=>"343.7", "TERM_SESSION_ID"=>"1BFA55B1-BBB1-47A1-9633-7B914FEF7551", "USER"=>"tgould", "__CF_USER_TEXT_ENCODING"=>"0x769B4C7D:0x0:0x0", "WORKON_HOME"=>"/Users/tgould/.virtualenvs", "VIRTUALENVWRAPPER_PYTHON"=>"/usr/local/bin/python3",
+[... edited for brevity ... ] , LINES"=>"53", "COLUMNS"=>"204"}
+</pre></p>
+<p>There you go: basically everything from the shell environment with a few extra things added by the Ruby process. For the site deployment, it wouldn't make sense to store my credentials in the Bash environment if I can make them available in Ruby.</p>
+<h2>Using middleman-dotenv</h2>
+<p><a href="https://github.com/bkeepers/dotenv">dotenv</a> is a gem that loads environment variables into a running Ruby process from a file, conventionally called .env. Implementations exist in several other languages, and middleman-dotenv makes it convenient to set up on a Middleman project.</p>
+<p>After adding <code>gem 'middleman-dotenv'</code> to my Gemfile and running <code>bundle install</code>, I make a file in the project root called .env, and I store the credentials in the format that Bash (via the POSIX standard) wants:</p>
+<p><pre>
+WEB_ROOT=/path/to/my/webroot
+USERNAME=myusername
+PASSWORD=mypassword
+</pre></p>
+<p>Then, I go back to my config.rb and add <code>activate :dotenv, env: '.env'</code> to the top, and change the deploy configuration to the following:</p>
+<p><pre>
+activate :deploy do |deploy|
+  deploy.deploy_method = :sftp
+  deploy.host          = 'tylergould.net'
+  deploy.port          = 22
+  deploy.path          = ENV['WEB_ROOT']
+  deploy.user          = ENV['USERNAME']
+  deploy.password      = ENV['PASSWORD']
+end
+</pre></p>
+<p>Now, when I run <code>bundle exec middleman deploy --build-before</code>, my site goes straight to my web server, and by adding .env to my .gitignore file, I can push my repo anywhere I want without worrying about accidentally publishing access to my shared hosting account, and I don't have to go fishing around for my credentials every time I want to deploy a blog post.</p>
