@@ -1,0 +1,45 @@
+---
+title: Converting SVG to JSX with my first Sublime plugin
+date: 2016/10/20
+published: true
+---
+
+<p>At work right now I'm building a touchscreen webapp in React with a lot of bespoke SVG animations. Attributes in inline SVGs need to be camel-cased to be valid as JSX, so usually I would include them as background images or use a special webpack loader to automatically include them as React components.</p>
+<p>Sadly, since I need to add classes on individual groups and paths for the animations, none of these methods will really help me, so all the find-and-replacing needs to happen in a shell script or in my editor directly.</p>
+<p>This was getting really tedious, and it really is a mindless task that would be better performed by a machine. And then I remembered: I write instructions for machines, that's my profession. Sublime has a plugin API and all I need to do is replace some strings. This shouldn't be too hard.</p>
+<h2>Where to look for information</h2>
+<p>Sublime's <a href="https://www.sublimetext.com/docs/3/api_reference.html">API reference</a> is pretty good, but it helps to see some existing projects when learning a new API.</p>
+<p>Reading that a View class "represents a view into a text buffer" makes sense, but seeing it in use is a much quicker path to understanding.</p>
+<p>The most helpful resource I found was <a href="https://code.tutsplus.com/tutorials/how-to-create-a-sublime-text-2-plugin--net-22685">a tuts+ article about making a Sublime 2 plugin</a>, and most of the information is still relevant to Sublime 3.</p>
+<h2>Getting things to work</h2>
+<p>I mostly write JavaScript but the fundamentals of programming are what they are, no matter the language. You declare variables to keep track of some piece of information, and you write functions to manipulate that information. I'm still learning Python, but it's not exactly like trying to read and write in Latin. It's more like trying to read and write in Pig Latin.</p>
+<p>So there was a little bit of muddling with the syntax, but I built a minimum-viable amount of functionality in a few hours. It's pretty simple. I wrote a function to replace all occurences of a pattern in a <code>sublime.View</code> with a string:</p>
+<pre>
+    def replace_all(self, edit, target, replacement):
+        """Replace all occurences of a pattern."""
+        regions = self.view.find_all(target)
+
+        for region in reversed(regions):
+            self.view.replace(edit, region, replacement)
+</pre>
+<p><code>sublime.View.find</code> will return a list of regions, and those regions can be used in <code>sublime.View</code>'s replace function. You can think of Regions like x and y coordinates into the editor's view that are unaware of the contents of the editor. So, if you erase text early in a buffer, then the text referenced by all succeeding regions will shift down by the length of the erased content. If you don't account for the shifting content, you end up erasing things you didn't want to erase.</p>
+<p>To get around this, first I tried keeping track of the length of erased content and offsetting the regions before replacing or erasing them. I ended up going with a much simpler approach: erasing/replacing text in reverse means you don't have to deal with the shifting text issue at all.</p>
+<p>When my plugin's <code>convert</code> command is run, this function (and its companion <code>erase_all</code>) gets run for every pattern we need to replace:</p>
+<pre>
+class ConvertCommand(sublime_plugin.TextCommand):
+    """Convert SVG in the open buffer to valid JSX."""
+    def run(self, edit):
+        for target in DELETIONS:
+            self.erase_all(edit, target)
+
+        for attr in REPLACEMENTS:
+            # replace all with this attribute
+            self.replace_all(edit, attr[0], attr[1])
+</pre>
+<h2>Is there a better way?</h2>
+<p>I'm not an SVG specialist, if such a thing exists, and I wasn't not sure whether I'd need to keep up with changes to the SVG spec, so I considered whether there might be some existing library to perform the transformations. I did find a node library, but it had some inaccurate information about <code>&lt;use&gt;</code> tags and <code>xlink:href</code> attributes, which I need implemented correctly on my current project.</p>
+<p>This is probably due to some SVG support quirks in older versions of React that have since been fixed. React's SVG support is pretty stable now, and the SVG spec itself hasn't been updated since 2011, so I think having a static list of transformations in the plugin itself is safe for the near future and doesn't depend on an external service or an active internet connection.</p>
+<p>One thing I'd like to do soon is add a command to uniquely namespace the masks and paths in a particular component. Sketch and Illustrator export generic names for these, which can create some weird and hard to debug issues in the final graphic if you have multiple graphics on a page.</p>
+<p>As I learn more about Python I'll probably keep the constants separate from the commands, and add a small test suite, but that's for another day.</p>
+<h2>Source and distribution</h2>
+<p>The source is available <a href="https://github.com/tylergould/sublime-svg-to-jsx/">here</a>, and I'm waiting for my pull request to the Package Control repo to be approved. In the meantime, you can install the SVG to JSX plugin manually by cloning the repo into <code>~/Library/Application Support/Sublime Text 3/Packages/</code>, if you so desire. The plugin has a narrow use case, but it's saving me a lot of time on this project that I used to spend finding and replacing the same six attributes.</p>
