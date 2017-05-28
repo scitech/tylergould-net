@@ -9,12 +9,7 @@ gem 'wdm', '~> 0.1.0', platforms: [:mswin, :mingw]
 gem 'tzinfo-data', platforms: [:mswin, :mingw, :jruby]
 
 # Middleman Gems
-gem 'middleman', '>= 4.0.0'
-
+gem 'middleman', '~> 4.2'
+gem 'middleman-autoprefixer', '~> 2.7'
 gem 'middleman-livereload', '3.4.6'
-
 gem "middleman-blog"
-
-gem "middleman-deploy"
-
-gem "middleman-dotenv"

@@ -1,4 +1,6 @@
-activate :dotenv, env: '.env.build'
+activate :autoprefixer do |prefix|
+  prefix.browsers = "last 2 versions"
+end
 
 page '/*.xml', layout: false
 page '/*.json', layout: false
@@ -13,15 +15,10 @@ activate :directory_indexes
 
 activate :livereload
 
+activate :asset_hash
+
 activate :blog do |blog|
   blog.sources = "posts/{year}-{month}-{day}-{title}"
   blog.permalink = "{year}/{month}/{day}/{title}"
   blog.layout = "blog_layout"
-end
-
-activate :deploy do |deploy|
-  deploy.deploy_method   = :sftp
-  deploy.host            = ENV['HOSTNAME']
-  deploy.port            = ENV['PORT']
-  deploy.path            = ENV['WEB_ROOT']
 end
